@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Konversi Bilangan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .converter-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .results-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.2em;
+            color: #212529;
+            font-family: 'Courier New', monospace;
+            background: #f1f3f4;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .calculation-steps {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .calculation-steps h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .step-content {
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .converter-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔢 Kalkulator Konversi Bilangan</h1>
+            <p>Konversi bilangan dengan perhitungan lengkap step-by-step</p>
+        </div>
+        
+        <div class="content">
+            <div class="converter-section">
+                <div class="input-section">
+                    <h3>Input Bilangan</h3>
+                    <div class="form-group">
+                        <label for="inputNumber">Masukkan Bilangan:</label>
+                        <input type="text" id="inputNumber" placeholder="Contoh: 255, 1010, FF, 377">
+                    </div>
+                    <div class="form-group">
+                        <label for="fromBase">Dari Sistem Bilangan:</label>
+                        <select id="fromBase">
+                            <option value="2">Biner (Base 2)</option>
+                            <option value="8">Oktal (Base 8)</option>
+                            <option value="10" selected>Desimal (Base 10)</option>
+                            <option value="16">Heksadesimal (Base 16)</option>
+                        </select>
+                    </div>
+                    <button class="convert-btn" onclick="convertNumber()">Konversi Bilangan</button>
+                </div>
+                
+                <div class="results-section">
+                    <h3>Hasil Konversi</h3>
+                    <div id="results">
+                        <p style="text-align: center; color: #6c757d; padding: 20px;">
+                            Masukkan bilangan dan pilih sistem bilangan untuk melihat hasil konversi
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+<div class="input-section" style="margin-top: 30px;">
+    <h3>Aritmatika Bilangan</h3>
+    <div class="form-group">
+        <label for="numberA">Bilangan A:</label>
+        <input type="text" id="numberA" placeholder="Contoh: 1010">
+        <select id="baseA" style="margin-top: 10px;">
+            <option value="2">Biner</option>
+            <option value="8">Oktal</option>
+            <option value="10" selected>Desimal</option>
+            <option value="16">Heksadesimal</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="numberB">Bilangan B:</label>
+        <input type="text" id="numberB" placeholder="Contoh: FF">
+        <select id="baseB" style="margin-top: 10px;">
+            <option value="2">Biner</option>
+            <option value="8">Oktal</option>
+            <option value="10" selected>Desimal</option>
+            <option value="16">Heksadesimal</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="operation">Operasi:</label>
+        <select id="operation">
+            <option value="+">Penjumlahan (+)</option>
+            <option value="-">Pengurangan (-)</option>
+            <option value="*">Perkalian (×)</option>
+            <option value="/">Pembagian (÷)</option>
+        </select>
+    </div>
+    <button class="convert-btn" onclick="performArithmetic()">Hitung Aritmatika</button>
+    <div id="arithmeticResult" style="margin-top: 15px;"></div>
+</div>
+
+
+
+            <div class="calculation-steps" id="calculationSteps" style="display: none;">
+                <h3>📊 Langkah-langkah Perhitungan</h3>
+                <div id="stepsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+function performArithmetic() {
+    const a = document.getElementById('numberA').value.trim();
+    const b = document.getElementById('numberB').value.trim();
+    const baseA = parseInt(document.getElementById('baseA').value);
+    const baseB = parseInt(document.getElementById('baseB').value);
+    const op = document.getElementById('operation').value;
+
+    if (!validateInput(a, baseA)) {
+        document.getElementById('arithmeticResult').innerHTML = `<div class="error">Bilangan A tidak valid untuk basis ${baseA}</div>`;
+        return;
+    }
+
+    if (!validateInput(b, baseB)) {
+        document.getElementById('arithmeticResult').innerHTML = `<div class="error">Bilangan B tidak valid untuk basis ${baseB}</div>`;
+        return;
+    }
+
+    const numA = parseInt(a, baseA);
+    const numB = parseInt(b, baseB);
+
+    let result;
+    switch (op) {
+        case '+': result = numA + numB; break;
+        case '-': result = numA - numB; break;
+        case '*': result = numA * numB; break;
+        case '/':
+            if (numB === 0) {
+                document.getElementById('arithmeticResult').innerHTML = `<div class="error">Tidak dapat membagi dengan nol</div>`;
+                return;
+            }
+            result = Math.floor(numA / numB); // pembagian bulat
+            break;
+    }
+
+    const binary = result.toString(2);
+    const octal = result.toString(8);
+    const decimal = result.toString(10);
+    const hex = result.toString(16).toUpperCase();
+
+    document.getElementById('arithmeticResult').innerHTML = `
+        <div class="result-item"><div class="result-label">Hasil Biner:</div><div class="result-value">${binary}</div></div>
+        <div class="result-item"><div class="result-label">Hasil Oktal:</div><div class="result-value">${octal}</div></div>
+        <div class="result-item"><div class="result-label">Hasil Desimal:</div><div class="result-value">${decimal}</div></div>
+        <div class="result-item"><div class="result-label">Hasil Heksadesimal:</div><div class="result-value">${hex}</div></div>
+    `;
+}
+
+
+
+    function convertNumber() {
+        const inputNumber = document.getElementById('inputNumber').value.trim();
+        const fromBase = parseInt(document.getElementById('fromBase').value);
+
+        if (!inputNumber) {
+            showError('Silakan masukkan bilangan yang ingin dikonversi');
+            return;
+        }
+
+        try {
+            let isNegative = inputNumber.startsWith('-');
+            let sanitizedInput = isNegative ? inputNumber.slice(1) : inputNumber;
+
+            // Validasi
+            if (!validateInput(sanitizedInput, fromBase)) {
+                showError('Input tidak valid untuk sistem bilangan yang dipilih');
+                return;
+            }
+
+            let decimalValue = parseInt(inputNumber, fromBase);
+            if (isNaN(decimalValue)) {
+                showError('Input tidak dapat dikonversi');
+                return;
+            }
+
+            showResults(decimalValue);
+            showCalculationSteps(sanitizedInput, fromBase, decimalValue, isNegative);
+
+        } catch (error) {
+            showError('Terjadi kesalahan dalam konversi: ' + error.message);
+        }
+    }
+
+    function validateInput(input, base) {
+        const validChars = {
+            2: /^[01]+$/,
+            8: /^[0-7]+$/,
+            10: /^[0-9]+$/,
+            16: /^[0-9A-Fa-f]+$/
+        };
+        return validChars[base].test(input);
+    }
+
+    function showResults(decimalValue) {
+        const resultsDiv = document.getElementById('results');
+
+        const binary = decimalValue < 0 ? toTwosComplement(decimalValue).binary : decimalValue.toString(2);
+        const octal = decimalValue < 0 ? parseInt(toTwosComplement(decimalValue).binary, 2).toString(8) : decimalValue.toString(8);
+        const hex = decimalValue < 0 ? parseInt(toTwosComplement(decimalValue).binary, 2).toString(16).toUpperCase() : decimalValue.toString(16).toUpperCase();
+
+        resultsDiv.innerHTML = `
+            <div class="result-item"><div class="result-label">Biner (Base 2):</div><div class="result-value">${binary}</div></div>
+            <div class="result-item"><div class="result-label">Oktal (Base 8):</div><div class="result-value">${octal}</div></div>
+            <div class="result-item"><div class="result-label">Desimal (Base 10):</div><div class="result-value">${decimalValue}</div></div>
+            <div class="result-item"><div class="result-label">Heksadesimal (Base 16):</div><div class="result-value">${hex}</div></div>
+        `;
+    }
+
+    function showCalculationSteps(inputNumber, fromBase, decimalValue, isNegative) {
+        const stepsDiv = document.getElementById('stepsContent');
+        const calculationSteps = document.getElementById('calculationSteps');
+        let stepsHTML = '';
+
+        if (fromBase !== 10) {
+            stepsHTML += generateToDecimalSteps(inputNumber, fromBase);
+        }
+
+        stepsHTML += generateFromDecimalSteps(decimalValue, isNegative);
+
+        stepsDiv.innerHTML = stepsHTML;
+        calculationSteps.style.display = 'block';
+    }
+
+    function generateToDecimalSteps(inputNumber, fromBase) {
+        let steps = `<div class="step">
+            <div class="step-title">Langkah 1: Konversi ${getBaseName(fromBase)} ke Desimal</div>
+            <div class="step-content">`;
+
+        const digits = inputNumber.split('').reverse();
+        let calculation = '';
+        let sum = 0;
+
+        for (let i = 0; i < digits.length; i++) {
+            const digit = digits[i];
+            const digitValue = parseInt(digit, fromBase);
+            const positionValue = Math.pow(fromBase, i);
+            const result = digitValue * positionValue;
+            sum += result;
+
+            if (i > 0) calculation += ' + ';
+            calculation += `${digit} × ${fromBase}^${i} = ${result}`;
+        }
+
+        steps += `${inputNumber} (base ${fromBase}) = ${calculation}<br>`;
+        steps += `= ${sum} (base 10)`;
+        steps += '</div></div>';
+
+        return steps;
+    }
+
+    function generateFromDecimalSteps(decimalValue, isNegative) {
+        let steps = '';
+
+        steps += generateDivisionSteps(decimalValue, 2, 'Biner', isNegative);
+        steps += generateDivisionSteps(decimalValue, 8, 'Oktal', isNegative);
+        steps += generateDivisionSteps(decimalValue, 16, 'Heksadesimal', isNegative);
+
+        return steps;
+    }
+
+function generateDivisionSteps(decimalValue, toBase, baseName) {
+    let steps = `<div class="step">
+        <div class="step-title">Konversi Desimal ke ${baseName}</div>
+        <div class="step-content">`;
+
+    if (decimalValue < 0) {
+        const twos = toTwosComplement(decimalValue);
+        steps += `Karena bilangan negatif, digunakan two's complement 8-bit:<br>`;
+        steps += `Bilangan: ${decimalValue} → two's complement = ${twos.binary}<br><br>`;
+
+        if (toBase === 2) {
+            steps += `Hasil: ${twos.binary} (base 2)`;
+        } else if (toBase === 8) {
+            const octal = parseInt(twos.binary, 2).toString(8);
+            const grouped = twos.binary.padStart(8, '0').match(/.{1,3}/g).join(' ');
+            steps += `Biner: ${twos.binary} → kelompok 3-bit: ${grouped}<br>`;
+            steps += `Oktal: ${octal}<br>`;
+            steps += `Hasil: ${octal} (base 8)`;
+        } else if (toBase === 16) {
+            const hex = parseInt(twos.binary, 2).toString(16).toUpperCase();
+            const grouped = twos.binary.padStart(8, '0').match(/.{1,4}/g).join(' ');
+            steps += `Biner: ${twos.binary} → kelompok 4-bit: ${grouped}<br>`;
+            steps += `Heksadesimal: ${hex}<br>`;
+            steps += `Hasil: ${hex} (base 16)`;
+        }
+    } else {
+        let quotient = decimalValue;
+        let remainders = [];
+        let divisionSteps = [];
+
+        while (quotient > 0) {
+            const remainder = quotient % toBase;
+            divisionSteps.push(`${quotient} ÷ ${toBase} = ${Math.floor(quotient / toBase)} sisa ${remainder}`);
+            remainders.unshift(remainder >= 10 ? String.fromCharCode(55 + remainder) : remainder);
+            quotient = Math.floor(quotient / toBase);
+        }
+
+        steps += divisionSteps.join('<br>') + '<br><br>';
+        steps += 'Baca sisa dari bawah ke atas:<br>';
+        steps += `Hasil: ${remainders.join('')} (base ${toBase})`;
+    }
+
+    steps += '</div></div>';
+    return steps;
+}
+
+    function toTwosComplement(value, bitLength = 8) {
+        const max = Math.pow(2, bitLength);
+        const binary = (max + value).toString(2).padStart(bitLength, '0');
+        return { binary };
+    }
+
+    function getBaseName(base) {
+        return {
+            2: 'Biner',
+            8: 'Oktal',
+            10: 'Desimal',
+            16: 'Heksadesimal'
+        }[base];
+    }
+
+    function showError(message) {
+        document.getElementById('results').innerHTML = `<div class="error">${message}</div>`;
+        document.getElementById('calculationSteps').style.display = 'none';
+    }
+
+    document.getElementById('inputNumber').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') convertNumber();
+    });
+</script>
+
+</body>
+</html>
