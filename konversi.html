@@ -316,17 +316,25 @@ function performArithmetic() {
             break;
     }
 
-    const binary = result.toString(2);
-    const octal = result.toString(8);
-    const decimal = result.toString(10);
-    const hex = result.toString(16).toUpperCase();
+    let binary, octal, hex;
 
-    document.getElementById('arithmeticResult').innerHTML = `
-        <div class="result-item"><div class="result-label">Hasil Biner:</div><div class="result-value">${binary}</div></div>
-        <div class="result-item"><div class="result-label">Hasil Oktal:</div><div class="result-value">${octal}</div></div>
-        <div class="result-item"><div class="result-label">Hasil Desimal:</div><div class="result-value">${decimal}</div></div>
-        <div class="result-item"><div class="result-label">Hasil Heksadesimal:</div><div class="result-value">${hex}</div></div>
-    `;
+if (result < 0) {
+    const twos = toTwosComplement(result);
+    binary = twos.binary;
+    octal = '-' + Math.abs(result).toString(8);
+    hex = twos.binaryToHex;  // tambahkan di bawah cara menghitungnya
+} else {
+    binary = result.toString(2);
+    octal = result.toString(8);
+    hex = result.toString(16).toUpperCase();
+}
+
+ document.getElementById('arithmeticResult').innerHTML = `
+    <div class="result-item"><div class="result-label">Hasil Biner:</div><div class="result-value">${binary}</div></div>
+    <div class="result-item"><div class="result-label">Hasil Oktal:</div><div class="result-value">${octal}</div></div>
+    <div class="result-item"><div class="result-label">Hasil Desimal:</div><div class="result-value">${result}</div></div>
+    <div class="result-item"><div class="result-label">Hasil Heksadesimal:</div><div class="result-value">${hex}</div></div>
+`;
 }
 
 
@@ -378,7 +386,10 @@ function performArithmetic() {
         const resultsDiv = document.getElementById('results');
 
         const binary = decimalValue < 0 ? toTwosComplement(decimalValue).binary : decimalValue.toString(2);
-        const octal = decimalValue < 0 ? parseInt(toTwosComplement(decimalValue).binary, 2).toString(8) : decimalValue.toString(8);
+        const octal = decimalValue < 0
+    ? '-' + Math.abs(decimalValue).toString(8)
+    : decimalValue.toString(8);
+
         const hex = decimalValue < 0 ? parseInt(toTwosComplement(decimalValue).binary, 2).toString(16).toUpperCase() : decimalValue.toString(16).toUpperCase();
 
         resultsDiv.innerHTML = `
@@ -446,52 +457,53 @@ function generateDivisionSteps(decimalValue, toBase, baseName) {
         <div class="step-title">Konversi Desimal ke ${baseName}</div>
         <div class="step-content">`;
 
-    if (decimalValue < 0) {
-        const twos = toTwosComplement(decimalValue);
-        steps += `Karena bilangan negatif, digunakan two's complement 8-bit:<br>`;
-        steps += `Bilangan: ${decimalValue} → two's complement = ${twos.binary}<br><br>`;
+if (decimalValue < 0 && (toBase === 2 || toBase === 16)) {
+    const twos = toTwosComplement(decimalValue);
+    steps += `Karena bilangan negatif, digunakan two's complement 8-bit:<br>`;
+    steps += `Bilangan: ${decimalValue} → two's complement = ${twos.binary}<br><br>`;
 
-        if (toBase === 2) {
-            steps += `Hasil: ${twos.binary} (base 2)`;
-        } else if (toBase === 8) {
-            const octal = parseInt(twos.binary, 2).toString(8);
-            const grouped = twos.binary.padStart(8, '0').match(/.{1,3}/g).join(' ');
-            steps += `Biner: ${twos.binary} → kelompok 3-bit: ${grouped}<br>`;
-            steps += `Oktal: ${octal}<br>`;
-            steps += `Hasil: ${octal} (base 8)`;
-        } else if (toBase === 16) {
-            const hex = parseInt(twos.binary, 2).toString(16).toUpperCase();
-            const grouped = twos.binary.padStart(8, '0').match(/.{1,4}/g).join(' ');
-            steps += `Biner: ${twos.binary} → kelompok 4-bit: ${grouped}<br>`;
-            steps += `Heksadesimal: ${hex}<br>`;
-            steps += `Hasil: ${hex} (base 16)`;
-        }
-    } else {
-        let quotient = decimalValue;
-        let remainders = [];
-        let divisionSteps = [];
-
-        while (quotient > 0) {
-            const remainder = quotient % toBase;
-            divisionSteps.push(`${quotient} ÷ ${toBase} = ${Math.floor(quotient / toBase)} sisa ${remainder}`);
-            remainders.unshift(remainder >= 10 ? String.fromCharCode(55 + remainder) : remainder);
-            quotient = Math.floor(quotient / toBase);
-        }
-
-        steps += divisionSteps.join('<br>') + '<br><br>';
-        steps += 'Baca sisa dari bawah ke atas:<br>';
-        steps += `Hasil: ${remainders.join('')} (base ${toBase})`;
+    if (toBase === 2) {
+        steps += `Hasil: ${twos.binary} (base 2)`;
+    } else if (toBase === 16) {
+        const hex = parseInt(twos.binary, 2).toString(16).toUpperCase();
+        const grouped = twos.binary.padStart(8, '0').match(/.{1,4}/g).join(' ');
+        steps += `Biner: ${twos.binary} → kelompok 4-bit: ${grouped}<br>`;
+        steps += `Heksadesimal: ${hex}<br>`;
+        steps += `Hasil: ${hex} (base 16)`;
     }
+} else if (decimalValue < 0 && toBase === 8) {
+    let quotient = Math.abs(decimalValue);
+    let remainders = [];
+    let divisionSteps = [];
+
+    while (quotient > 0) {
+        const remainder = quotient % 8;
+        divisionSteps.push(`${quotient} ÷ 8 = ${Math.floor(quotient / 8)} sisa ${remainder}`);
+        remainders.unshift(remainder);
+        quotient = Math.floor(quotient / 8);
+    }
+
+    steps += `Bilangan negatif tidak menggunakan two's complement untuk Oktal.<br>`;
+    steps += divisionSteps.join('<br>') + '<br><br>';
+    steps += `Hasil: -${remainders.join('')} (base 8)`;
+}
+
 
     steps += '</div></div>';
     return steps;
 }
 
     function toTwosComplement(value, bitLength = 8) {
-        const max = Math.pow(2, bitLength);
-        const binary = (max + value).toString(2).padStart(bitLength, '0');
-        return { binary };
-    }
+    const max = Math.pow(2, bitLength);
+    const unsigned = max + value;
+    const binary = unsigned.toString(2).padStart(bitLength, '0');
+    const hex = unsigned.toString(16).toUpperCase().padStart(bitLength / 4, '0');
+    return {
+        binary: binary,
+        binaryToHex: hex
+    };
+}
+
 
     function getBaseName(base) {
         return {
